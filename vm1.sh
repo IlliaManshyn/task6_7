@@ -17,6 +17,11 @@ ip link add link $INTERNAL_IF name $INTERNAL_IF.$VLAN type vlan id $VLAN
 
 ifconfig $INTERNAL_IF.$VLAN $VLAN_IP
 
+sysctl -w net.ipv4.ip_forward=1
+iptables -t nat -A POSTROUTING -o $EXTERNAL_IF -j MASQUERADE
+iptables -A FORWARD -i $EXTERNAL_IF -o $INTERNAL_IF -m state --state RELATED,ESTABLISHED -j ACCEPT
+iptables -A FORWARD -i $INTERNAL_IF -o $EXTERNAL_IF -j ACCEPT
+
 CHECK=$(dpkg -s nginx | grep -o "install ok installed")
 TEXT="install ok installed"
 
