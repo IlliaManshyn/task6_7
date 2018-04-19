@@ -32,8 +32,6 @@ fi
 
 EXTERNAL_INT_IP=$(ip -br address show $EXTERNAL_IF | sed 's/\s\+/,/g' | cut -d ',' -f3 | cut -d '/' -f1)
 
-cat $dir/openssl.cnf | sed 's/EXT_IP/'$EXT_IP'/'  > /etc/ssl/openssl.cnf
-
 cd /etc/ssl/certs
 openssl req -newkey rsa:2048 -nodes -keyout privateCA.key \
 -subj /C=UA/O=Mirantis/CN=$HOSTNAME/emailAddress=. -out CA_csr.csr
@@ -45,9 +43,20 @@ openssl genrsa -out nginx.web.key 2048
 cd /etc/ssl/certs
 openssl req -new -key nginx.web.key \
 -subj /C=UA/O=Mirantis/CN=$HOSTNAME/emailAddress=.  -out nginx.web.csr
+if [ "$EXT_IP" == DHCP ]
+then
 cd /etc/ssl/certs
-openssl x509 -req -in nginx.web.csr -CA root-ca.crt \
--CAkey privateCA.key -CAcreateserial -out web.crt -days 90
+openssl x509 -req \
+-extfile <(printf "subjectAltName=IP:$EXTERNAL_INT_IP,DNS:$HOSTNAME") -days 365\
+ -in nginx.web.csr -CA root-ca.crt\
+ -CAkey privateCA.key -CAcreateserial -out web.crt
+else
+cd /etc/ssl/certs
+openssl x509 -req \
+-extfile <(printf "subjectAltName=IP:$EXT_IP,DNS:$HOSTNAME") -days 365\
+ -in nginx.web.csr -CA root-ca.crt\
+ -CAkey privateCA.key -CAcreateserial -out web.crt
+fi
 cat /etc/ssl/certs/web.crt /etc/ssl/certs/root-ca.crt > /etc/ssl/certs/web.pem
 
 cat $dir/site1.conf | sed 's/SERVER_NAME/'$HOSTNAME'/'| sed 's/APACHE_VLAN_IP/'$APACHE_VLAN_IP'/g'| sed 's/NGINX_PORT/'$NGINX_PORT'/' | sed 's/EXTERNAL_INT_IP/'$EXTERNAL_INT_IP'/g' | sed 's/SERVER_NAME/'$HOSTNAME'/' > /etc/nginx/conf.d/site1.conf
