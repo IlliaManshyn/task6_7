@@ -50,7 +50,7 @@ openssl x509 -req -in nginx.web.csr -CA root-ca.crt \
 -CAkey privateCA.key -CAcreateserial -out web.crt -days 90
 cat /etc/ssl/certs/web.crt /etc/ssl/certs/root-ca.crt > /etc/ssl/certs/web.pem
 
-cat $dir/site1.conf | sed 's/APACHE_VLAN_IP/'$APACHE_VLAN_IP'/g'| sed 's/NGINX_PORT/'$NGINX_PORT'/' | sed 's/EXTERNAL_INT_IP/'$EXTERNAL_INT_IP'/g' | sed 's/SERVER_NAME/'$HOSTNAME'/' > /etc/nginx/conf.d/site1.conf
+cat $dir/site1.conf | sed 's/SERVER_NAME/'$HOSTNAME'/'| sed 's/APACHE_VLAN_IP/'$APACHE_VLAN_IP'/g'| sed 's/NGINX_PORT/'$NGINX_PORT'/' | sed 's/EXTERNAL_INT_IP/'$EXTERNAL_INT_IP'/g' | sed 's/SERVER_NAME/'$HOSTNAME'/' > /etc/nginx/conf.d/site1.conf
 
 service nginx restart
 

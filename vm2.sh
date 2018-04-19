@@ -26,7 +26,7 @@ APACHE_IP=$(echo $APACHE_VLAN_IP | cut -d '/' -f1 )
 
 cat $dir/apache2.conf | grep -v "#" | sed 's/APACHE_VLAN_IP/'$APACHE_IP'/' > /etc/apache2/apache2.conf
 
-cat $dir/site1_apache.conf | sed 's/VLAN_IP/'$APACHE_IP'/' > /etc/apache2/sites-available/site1.conf
+cat $dir/site1_apache.conf | sed 's/SERVER_NAME/'$HOSTNAME'/' | sed 's/VLAN_IP/'$APACHE_IP'/' > /etc/apache2/sites-available/site1.conf
 
 a2ensite site1.conf
 
