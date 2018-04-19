@@ -11,6 +11,7 @@ ip link add link $INTERNAL_IF name  $INTERNAL_IF.$VLAN type vlan id $VLAN
 ifconfig $INTERNAL_IF.$VLAN $APACHE_VLAN_IP
 
 route add -net 0.0.0.0 netmask 0.0.0.0 gw $GW_IP $INTERNAL_IF
+echo "nameserver 8.8.8.8" > /etc/resolv.conf
 
 sysctl -w net.ipv4.ip_forward=1
 
