@@ -4,7 +4,7 @@ dir="$(cd "$(dirname "$0")" && pwd)"
 
 source $dir/vm2.conf
 
-ifconfig $INTERNAL_IF $INTERNAL_IP
+ifconfig $INTERNAL_IF $INT_IP
 route add default gw $GW_IP
 
 ip link add link $INTERNAL_IF name  $INTERNAL_IF.$VLAN type vlan id $VLAN
